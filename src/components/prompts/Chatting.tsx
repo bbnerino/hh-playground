@@ -4,15 +4,11 @@ import React from "react";
 const Chatting = ({ messages }: { messages: Message[] }) => {
   // Scroll 영역
   return (
-    <div className="flex flex-col gap-2 h-[calc(100vh-300px)] overflow-y-auto items-start">
-      {messages.map((message) => {
+    <div className="flex flex-col gap-2 items-start">
+      {messages.map((message, index) => {
         return (
-          <div key={message.id} className="w-full">
-            {message.content
-              .filter((content) => content.type === "output_text" || content.type === "input_text")
-              .map((content, index) => (
-                <ChattingMessage role={message.role} key={index} message={content.text} />
-              ))}
+          <div key={index} className="w-full">
+            <ChattingMessage role={message.role} message={message.content} />
           </div>
         );
       })}
