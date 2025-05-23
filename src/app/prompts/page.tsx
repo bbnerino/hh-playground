@@ -45,7 +45,7 @@ const PromptPage = () => {
     }
   ];
 
-  const [messages, setMessages] = useState<Message[]>(chat);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   // 시스템 프롬프트
   const [systemPrompt, setSystemPrompt] = useState<string>("");
@@ -60,36 +60,47 @@ const PromptPage = () => {
   const [maxOutputTokens, setMaxOutputTokens] = useState<number>(2048);
 
   // 입력
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState("");
+
+  const scrollDown = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    chatRef?.current?.scrollTo({
+      top: chatRef.current.scrollHeight,
+      behavior: "smooth"
+    });
+  };
 
   const onSendMessage = async () => {
+    const _messages = [...messages, new Message(input)];
+    setInput("");
+    setMessages(_messages);
+
     const promptRequest = new PromptRequest({
       model: model.name,
-      messages: messages,
-      userPrompt: input,
+      messages: _messages,
       systemPrompt
     });
-
-    // promptRequest.setTool()
-
-    setInput("");
-
-    chatRef?.current?.scrollTo({
-      top: chatRef.current.scrollHeight,
-      behavior: "smooth"
-    });
+    scrollDown();
+    
     const newMessage = await promptRequest.request();
+    scrollDown();
 
-    chatRef?.current?.scrollTo({
-      top: chatRef.current.scrollHeight,
-      behavior: "smooth"
-    });
-
-    setMessages([...messages, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
   };
 
   const chatRef = useRef<HTMLDivElement>(null);
 
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (e.nativeEvent.isComposing) {
+      return;
+    }
+    // isComposing이 true일 때, 얼리 리턴을 통해 함수가 종료되도록 함.
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onSendMessage();
+    }
+  };
   return (
     <div className="min-h-screen bg-white">
       <PromptHeader />
@@ -172,13 +183,8 @@ const PromptPage = () => {
                 placeholder="Chat with your prompt..."
                 className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:border-gray-400"
                 value={input}
+                onKeyDown={onPressEnter}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    onSendMessage();
-                  }
-                }}
               />
               <div
                 className="absolute bottom-4 right-2 flex items-center rounded-full bg-green-300 w-10 h-10 justify-center hover:bg-green-400 cursor-pointer"
