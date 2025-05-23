@@ -24,7 +24,7 @@ export class PromptRequest {
     this.tools = tools;
   }
 
-  public async request(): Promise<{ toolCall: boolean; messages: Message[] }> {
+  public async request(): Promise<{ toolCalled: boolean; messages: Message[] }> {
     // LLM 호출 (API Route 활용)
 
     this.setSystemPrompt();
@@ -49,7 +49,7 @@ export class PromptRequest {
         content: data.result || "Failed to request"
       });
 
-      return { toolCall: false, messages };
+      return { toolCalled: false, messages };
     }
 
     if (res.status === 202) {
@@ -60,22 +60,23 @@ export class PromptRequest {
       const messages = [...this.messages];
 
       for (const toolCall of toolCalls) {
+        messages.push(
+          new Message(
+            JSON.stringify({
+              type: "function_call",
+              call_id: toolCall.id,
+              name: toolCall.function.name,
+              arguments: toolCall.function.arguments
+            }),
+            "assistant"
+          )
+        );
         try {
-          const tool = toolExecute[toolCall.function.name as keyof typeof toolExecute];
-          const args = JSON.parse(toolCall.function.arguments || "{}");
-          messages.push(
-            new Message(
-              JSON.stringify({
-                type: "function_call",
-                call_id: toolCall.id,
-                name: toolCall.function.name,
-                arguments: JSON.stringify(args)
-              }),
-              "assistant"
-            )
-          );
+          const { name, arguments: args } = toolCall.function;
+          const tool = toolExecute[name];
+          const parsedArgs = JSON.parse(args);
 
-          const result = await tool(args);
+          const result = await tool(parsedArgs);
 
           messages.push(
             new Message(
@@ -102,12 +103,12 @@ export class PromptRequest {
         }
       }
 
-      return { toolCall: true, messages };
+      return { toolCalled: true, messages };
     }
 
     const message = await res.json();
     return {
-      toolCall: false,
+      toolCalled: false,
       messages: [
         ...this.messages,
         {

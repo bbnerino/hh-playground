@@ -4,7 +4,7 @@ import React from "react";
 const Chatting = ({ messages }: { messages: Message[] }) => {
   // Scroll 영역
   return (
-    <div className="flex flex-col gap-2 items-start chat-scroll">
+    <div className="flex flex-col gap-2 items-start">
       {messages.map((message, index) => {
         return (
           <div key={index} className="w-full">

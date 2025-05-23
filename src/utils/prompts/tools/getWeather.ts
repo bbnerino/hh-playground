@@ -1,4 +1,4 @@
-export const getWeatherRequest = {
+export const getWeatherFunctionData = {
   type: "function",
   function: {
     name: "getWeather",

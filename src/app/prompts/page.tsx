@@ -72,7 +72,7 @@ const PromptPage = () => {
   };
 
   const onSendMessage = async () => {
-    const _messages = [...messages, new Message(input)];
+    const _messages = [...messages, new Message(input, "user")];
     setInput("");
     setMessages(_messages);
 
@@ -88,7 +88,7 @@ const PromptPage = () => {
     scrollDown();
     setMessages(response.messages);
     console.log("🔵🐶🔵🔵🔵", response);
-    if (response.toolCall) {
+    if (response.toolCalled) {
       setRequestTrigger(true);
     }
   };
@@ -143,7 +143,7 @@ const PromptPage = () => {
             <label className="block text-sm font-medium text-gray-700">Model</label>
             <div className="relative">
               <select
-                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md appearance-none pr-10 focus:outline-none focus:border-gray-400"
+                className="w-50 px-3 py-2 bg-white border border-gray-300 rounded-md appearance-none pr-10 focus:outline-none focus:border-gray-400 cursor-pointer"
                 value={model.name}
                 onChange={(e) => setModel(models.find((m) => m.name === e.target.value) as PromptModel)}
               >
@@ -212,7 +212,7 @@ const PromptPage = () => {
                   <p className="mt-2">Your conversation will appear here</p>
                 </div>
               ) : (
-                <div className="w-full h-[calc(100vh-300px)] overflow-y-auto" ref={chatRef}>
+                <div className="chat-scroll w-full h-[calc(100vh-300px)] overflow-y-auto" ref={chatRef}>
                   <Chatting messages={messages} />
                 </div>
               )}
