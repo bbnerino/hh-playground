@@ -4,7 +4,7 @@ import React from "react";
 const Chatting = ({ messages }: { messages: Message[] }) => {
   // Scroll 영역
   return (
-    <div className="flex flex-col gap-2 items-start">
+    <div className="flex flex-col gap-2 items-start chat-scroll">
       {messages.map((message, index) => {
         return (
           <div key={index} className="w-full">
@@ -16,25 +16,35 @@ const Chatting = ({ messages }: { messages: Message[] }) => {
   );
 };
 
-const ChattingMessage = ({ role, message }: { role: "user" | "assistant" | "system"; message: string }) => {
+const ChattingMessage = ({
+  role = "user",
+  message = ""
+}: {
+  role?: "user" | "assistant" | "system";
+  message?: string;
+}) => {
   const mapRole = {
     user: "User",
     assistant: "Assistant",
-    system: "System"
+    system: "System",
+    function_call: "Function Call",
+    function_call_output: "Function Call Output"
   };
 
   //    ``` ``` 영역 background 컬러 변경
-  const processedMessage = message
-    ?.replace(/\n/g, "<br />")
-    ?.replace(
-      /```(.*?)```/g,
-      `<div class="bg-gray-100 p-2 rounded-md"><p class="text-sm text-gray-500">Code</p>$1</div>`
-    );
+  let processedMessage = message?.replace(/\n/g, "<br />");
+
+  processedMessage = processedMessage?.replace(
+    /```(.*?)```/g,
+    `<div class="bg-gray-100 p-2 rounded-md"><p class="text-sm text-gray-500">Code</p>$1</div>`
+  );
+
+  processedMessage = processedMessage?.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
 
   return (
-    <div className="flex flex-col border border-transparent p-2 gap-2 cursor-pointer hover:border hover:border-gray-300 hover:rounded-md">
+    <div className="flex flex-col border border-transparent p-2 gap-2 cursor-pointer hover:border hover:border-gray-300 hover:rounded-md max-w-xl break-words">
       <div className="text-sm text-gray-500">{mapRole[role]}</div>
-      <div className="text-sm" dangerouslySetInnerHTML={{ __html: processedMessage }} />
+      <div className="text-sm break-words whitespace-pre-line" dangerouslySetInnerHTML={{ __html: processedMessage }} />
     </div>
   );
 };

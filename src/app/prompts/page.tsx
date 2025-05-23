@@ -5,12 +5,16 @@ import PromptHeader from "@/components/prompts/Header";
 import { Message } from "@/types/prompts/chat";
 import { PromptModel } from "@/types/prompts/model";
 import { PromptRequest } from "@/types/prompts/request";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Modal from "@/components/modal";
+import ToolsModal from "./toolsModal";
+import { Tool } from "@/types/prompts/tool";
+import { getWeather } from "@/utils/prompts/tools/getWeather";
 
 const PromptPage = () => {
   const models = [
-    { name: "gpt-4.1-mini", description: "text.format: text temp: 1.00 tokens: 2048 top_p: 1.00 store: true" },
-    { name: "gpt-4.1", description: "text.format: text temp: 1.00 tokens: 2048 top_p: 1.00 store: true" }
+    { name: "gpt-4.1", description: "text.format: text temp: 1.00 tokens: 2048 top_p: 1.00 store: true" },
+    { name: "gpt-4.1-mini", description: "text.format: text temp: 1.00 tokens: 2048 top_p: 1.00 store: true" }
   ];
   const [model, setModel] = useState<PromptModel>(models[0]);
 
@@ -50,9 +54,6 @@ const PromptPage = () => {
   // 시스템 프롬프트
   const [systemPrompt, setSystemPrompt] = useState<string>("");
 
-  // 툴
-  const [tools, setTools] = useState<string[]>([]);
-
   // 온도
   const [temperature, setTemperature] = useState<number>(0.5);
 
@@ -80,13 +81,25 @@ const PromptPage = () => {
       messages: _messages,
       systemPrompt
     });
-    scrollDown();
-    
-    const newMessage = await promptRequest.request();
+    promptRequest.setTools(tools);
     scrollDown();
 
-    setMessages((prev) => [...prev, newMessage]);
+    const response = await promptRequest.request();
+    scrollDown();
+    setMessages(response.messages);
+    console.log("🔵🐶🔵🔵🔵", response);
+    if (response.toolCall) {
+      setRequestTrigger(true);
+    }
   };
+
+  const [requestTrigger, setRequestTrigger] = useState(false);
+  useEffect(() => {
+    if (requestTrigger) {
+      setRequestTrigger(false);
+      onSendMessage();
+    }
+  }, [requestTrigger]);
 
   const chatRef = useRef<HTMLDivElement>(null);
 
@@ -94,13 +107,31 @@ const PromptPage = () => {
     if (e.nativeEvent.isComposing) {
       return;
     }
-    // isComposing이 true일 때, 얼리 리턴을 통해 함수가 종료되도록 함.
 
     if (e.key === "Enter") {
       e.preventDefault();
-      onSendMessage();
+      setRequestTrigger(true);
     }
   };
+
+  // tools
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const handleModalConfirm = (selectedTools: Tool[]) => {
+    setIsOpenModal(false);
+    setTools(selectedTools);
+  };
+
+  const handleRemoveTool = (toolName: string) => {
+    setTools(tools.filter((tool) => tool.function.name !== toolName));
+  };
+
+  const onClickTool = async () => {
+    const data = await getWeather({ lat: 37.5665, lon: 126.978 });
+    console.log(data);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <PromptHeader />
@@ -132,12 +163,24 @@ const PromptPage = () => {
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Tools</label>
             <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Create..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-gray-400"
-              />
-              <Button>+</Button>
+              <div className="flex flex-wrap gap-2">
+                {tools.map((tool) => (
+                  <div
+                    key={tool.function.name}
+                    className="flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200 cursor-pointer"
+                  >
+                    <span>{tool.function.name}</span>
+                    <button
+                      onClick={() => handleRemoveTool(tool.function.name)}
+                      className="cursor-pointer w-4 h-4 flex items-center justify-center hover:text-gray-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <Button onClick={() => setIsOpenModal(true)}>+</Button>
+              {/* <Button onClick={onClickTool}>+</Button> */}
             </div>
           </div>
 
@@ -188,7 +231,7 @@ const PromptPage = () => {
               />
               <div
                 className="absolute bottom-4 right-2 flex items-center rounded-full bg-green-300 w-10 h-10 justify-center hover:bg-green-400 cursor-pointer"
-                onClick={onSendMessage}
+                onClick={() => setRequestTrigger(true)}
               >
                 ⬆
               </div>
@@ -196,6 +239,13 @@ const PromptPage = () => {
           </div>
         </PromptLayoutRight>
       </main>
+
+      <ToolsModal
+        open={isOpenModal}
+        onClose={() => setIsOpenModal(false)}
+        onConfirm={handleModalConfirm}
+        tools={tools}
+      />
     </div>
   );
 };
