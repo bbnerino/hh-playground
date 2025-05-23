@@ -9,21 +9,7 @@ export async function POST(req: NextRequest) {
     const response = await openai.chat.completions.create(promptRequest);
 
     if (response.choices[0].message.tool_calls) {
-      // {
-      //   id: 'call_YoFFOqLklfydCGu6iYRym2ev',
-      //   type: 'function',
-      //   function: {
-      //     name: 'get_time',
-      //     arguments: '{"location":"Seoul, South Korea"}'
-      //   }
-      // }
-      // status 200
-      return NextResponse.json(
-        {
-          tool_calls: response.choices[0].message.tool_calls
-        },
-        { status: 202 }
-      );
+      return NextResponse.json({ tool_calls: response.choices[0].message.tool_calls }, { status: 202 });
     }
 
     return NextResponse.json({ result: response.choices[0].message.content });

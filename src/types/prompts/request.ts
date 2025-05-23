@@ -150,3 +150,13 @@ export class PromptRequest {
     return res;
   }
 }
+
+export interface IPromptRequest {
+  model: string;
+  messages: Message[];
+  tools: Tool[];
+  temperature: number;
+  top_p: number;
+  store: boolean;
+  tool_choice: string;
+}

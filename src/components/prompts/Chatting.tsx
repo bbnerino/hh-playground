@@ -1,7 +1,7 @@
 import { Message } from "@/types/prompts/chat";
 import React from "react";
 
-const Chatting = ({ messages }: { messages: Message[] }) => {
+const Chatting = ({ messages, isLoading }: { messages: Message[]; isLoading: boolean }) => {
   // Scroll 영역
   return (
     <div className="flex flex-col gap-2 items-start">
@@ -12,6 +12,7 @@ const Chatting = ({ messages }: { messages: Message[] }) => {
           </div>
         );
       })}
+      {isLoading && <div className="w-full h-10 bg-gray-100 rounded-md"></div>}
     </div>
   );
 };

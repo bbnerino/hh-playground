@@ -18,63 +18,23 @@ const PromptPage = () => {
   ];
   const [model, setModel] = useState<PromptModel>(models[0]);
 
-  const chat: Message[] = [
-    {
-      role: "user",
-      content: "안녕 반가워 "
-    },
-    {
-      id: "msg_682d8ca6d7248191b498ba5fb6f6f6080eda892f29d3cd35",
-      role: "assistant",
-      content: "안녕! 반가워요. 어떻게 도와드릴까요?"
-    },
-    {
-      role: "user",
-      content: "그러게 말이야"
-    },
-    {
-      id: "msg_682d9010973481918005b08b5ad4461a0eda892f29d3cd35",
-      role: "assistant",
-      content: "그렇죠! 궁금한 거 있으면 언제든지 물어보세요. :)"
-    },
-    {
-      role: "user",
-      content:
-        '지금 api 요청을 보면\n Message {\n  id: string;\n  role: "user" | "assistant";\n  content: {\n    type: "output_text";\n    text: string;\n  }[];\n}\n이렇게 생겻는데 왜 content가 리스트야?'
-    },
-    {
-      id: "msg_682da8e641d4819182230db45e7f80260eda892f29d3cd35",
-      role: "assistant",
-      content: "강아지 그려줘123"
-    }
-  ];
-
   const [messages, setMessages] = useState<Message[]>([]);
 
   // 시스템 프롬프트
   const [systemPrompt, setSystemPrompt] = useState<string>("");
 
-  // 온도
-  const [temperature, setTemperature] = useState<number>(0.5);
-
-  // 최대 출력 토큰
-  const [maxOutputTokens, setMaxOutputTokens] = useState<number>(2048);
-
   // 입력
-  const [input, setInput] = useState("");
 
-  const scrollDown = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    chatRef?.current?.scrollTo({
-      top: chatRef.current.scrollHeight,
-      behavior: "smooth"
-    });
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onSendMessage = async () => {
-    const _messages = [...messages, new Message(input, "user")];
-    setInput("");
-    setMessages(_messages);
+  const onSendMessage = async (submit: boolean = true) => {
+    setIsLoading(true);
+    let _messages = [...messages];
+    if (submit) {
+      _messages = [...messages, new Message(userPrompt, "user")];
+      setMessages(_messages);
+      setUserPrompt("");
+    }
 
     const promptRequest = new PromptRequest({
       model: model.name,
@@ -87,34 +47,40 @@ const PromptPage = () => {
     const response = await promptRequest.request();
     scrollDown();
     setMessages(response.messages);
-    console.log("🔵🐶🔵🔵🔵", response);
     if (response.toolCalled) {
       setRequestTrigger(true);
     }
+    setIsLoading(false);
   };
 
   const [requestTrigger, setRequestTrigger] = useState(false);
   useEffect(() => {
     if (requestTrigger) {
       setRequestTrigger(false);
-      onSendMessage();
+      onSendMessage(false);
     }
   }, [requestTrigger]);
 
+  // CHATTING
+  const [userPrompt, setUserPrompt] = useState("");
   const chatRef = useRef<HTMLDivElement>(null);
+  const scrollDown = async () => {
+    chatRef?.current?.scrollTo({
+      top: chatRef.current.scrollHeight,
+      behavior: "smooth"
+    });
+  };
 
   const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (e.nativeEvent.isComposing) {
-      return;
-    }
+    if (e.nativeEvent.isComposing) return;
 
     if (e.key === "Enter") {
       e.preventDefault();
-      setRequestTrigger(true);
+      onSendMessage(true);
     }
   };
 
-  // tools
+  // TOOLS
   const [tools, setTools] = useState<Tool[]>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -125,11 +91,6 @@ const PromptPage = () => {
 
   const handleRemoveTool = (toolName: string) => {
     setTools(tools.filter((tool) => tool.function.name !== toolName));
-  };
-
-  const onClickTool = async () => {
-    const data = await getWeather({ lat: 37.5665, lon: 126.978 });
-    console.log(data);
   };
 
   return (
@@ -213,7 +174,7 @@ const PromptPage = () => {
                 </div>
               ) : (
                 <div className="chat-scroll w-full h-[calc(100vh-300px)] overflow-y-auto" ref={chatRef}>
-                  <Chatting messages={messages} />
+                  <Chatting messages={messages} isLoading={isLoading} />
                 </div>
               )}
             </div>
@@ -225,13 +186,13 @@ const PromptPage = () => {
               <textarea
                 placeholder="Chat with your prompt..."
                 className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:border-gray-400"
-                value={input}
+                value={userPrompt}
                 onKeyDown={onPressEnter}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => setUserPrompt(e.target.value)}
               />
               <div
                 className="absolute bottom-4 right-2 flex items-center rounded-full bg-green-300 w-10 h-10 justify-center hover:bg-green-400 cursor-pointer"
-                onClick={() => setRequestTrigger(true)}
+                onClick={() => onSendMessage(true)}
               >
                 ⬆
               </div>
