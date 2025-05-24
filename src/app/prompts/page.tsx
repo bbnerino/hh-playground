@@ -6,10 +6,8 @@ import { Message } from "@/types/prompts/chat";
 import { PromptModel } from "@/types/prompts/model";
 import { PromptRequest } from "@/types/prompts/request";
 import React, { useEffect, useRef, useState } from "react";
-import Modal from "@/components/modal";
 import ToolsModal from "./toolsModal";
 import { Tool } from "@/types/prompts/tool";
-import { getWeather } from "@/utils/prompts/tools/getWeather";
 import VectorStoreModal from "./vectorStoreModal";
 import { VectorCollection } from "@/types/prompts/vectorStore";
 
