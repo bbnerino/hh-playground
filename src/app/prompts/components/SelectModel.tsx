@@ -20,21 +20,18 @@ const SelectModel = ({ model, setModel }: { model: PromptModel; setModel: (model
 
   const models = data?.models as PromptModel[];
   return (
-    <div className="space-y-2">
-      <label className="block text-md font-bold text-gray-700">Model</label>
-      <div className="relative">
-        <select
-          className="w-50 px-3 py-2 bg-white border border-gray-300 rounded-md appearance-none pr-10 focus:outline-none focus:border-gray-400 cursor-pointer"
-          value={model.name}
-          onChange={(e) => setModel(models.find((m) => m.name === e.target.value) as PromptModel)}
-        >
-          {models.map((model) => (
-            <option key={model.name} value={model.name}>
-              {model.name}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div className="relative">
+      <select
+        className="w-50 px-3 py-2 bg-white border border-gray-300 rounded-md appearance-none pr-10 focus:outline-none focus:border-gray-400 cursor-pointer"
+        value={model.name}
+        onChange={(e) => setModel(models.find((m) => m.name === e.target.value) as PromptModel)}
+      >
+        {models.map((model) => (
+          <option key={model.name} value={model.name}>
+            {model.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 };

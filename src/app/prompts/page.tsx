@@ -12,6 +12,7 @@ import VectorStoreModal from "./components/modal/vectorStoreModal";
 import { VectorCollection } from "@/types/prompts/vectorStore";
 import SelectModel from "./components/SelectModel";
 import ItemButton from "./components/ItemButton";
+import { PromptLayout } from "./components/PromptLayout";
 
 const PromptPage = () => {
   // MODEL
@@ -50,7 +51,7 @@ const PromptPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  const handleModalConfirm = (selectedTools: Tool[]) => {
+  const onConfirmTools = (selectedTools: Tool[]) => {
     setIsOpenModal(false);
     setTools(selectedTools);
   };
@@ -69,7 +70,7 @@ const PromptPage = () => {
       vectorCollections.filter((vectorCollection) => vectorCollection.name !== vectorCollectionName)
     );
   };
-  const handleModalConfirmVectorCollection = (selectedVectorCollections: VectorCollection[]) => {
+  const onConfirmVectorCollections = (selectedVectorCollections: VectorCollection[]) => {
     setVectorCollectionsOpen(false);
     setVectorCollections(selectedVectorCollections);
   };
@@ -102,16 +103,15 @@ const PromptPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <PromptHeader />
-
-      <main className="flex h-[calc(100vh-4rem)]">
-        <div className="w-1/2 border-r border-gray-300 p-6 flex flex-col gap-6">
+      <PromptLayout.Main>
+        <PromptLayout.Left>
           {/* MODEL */}
-          <SelectModel model={model} setModel={setModel} />
+          <PromptLayout.Content title="Model">
+            <SelectModel model={model} setModel={setModel} />
+          </PromptLayout.Content>
 
           {/* TOOLS */}
-          <div className="space-y-2">
-            <label className="block text-md font-bold text-gray-700">Tools</label>
+          <PromptLayout.Content title="Tools">
             <div className="flex gap-2">
               <div className="flex flex-wrap gap-2">
                 {tools.map((tool, index) => (
@@ -119,18 +119,11 @@ const PromptPage = () => {
                 ))}
               </div>
               <Button onClick={() => setIsOpenModal(true)}>+</Button>
-              <ToolsModal
-                open={isOpenModal}
-                onClose={() => setIsOpenModal(false)}
-                onConfirm={handleModalConfirm}
-                tools={tools}
-              />
             </div>
-          </div>
+          </PromptLayout.Content>
 
           {/* VECTOR STORE */}
-          <div className="space-y-2">
-            <label className="block text-md font-bold text-gray-700">Vector Store</label>
+          <PromptLayout.Content title="Vector Store">
             <div className="flex gap-2">
               <div className="flex flex-wrap gap-2">
                 {vectorCollections.map((vectorCollection, index) => (
@@ -142,32 +135,23 @@ const PromptPage = () => {
                 ))}
               </div>
               <Button onClick={() => setVectorCollectionsOpen(true)}>+</Button>
-              <VectorStoreModal
-                open={vectorCollectionsOpen}
-                onClose={() => setVectorCollectionsOpen(false)}
-                onConfirm={handleModalConfirmVectorCollection}
-                vectorCollections={vectorCollections}
-              />
             </div>
-          </div>
+          </PromptLayout.Content>
 
           {/* SYSTEM MESSAGE */}
-          <div className="space-y-2">
-            <label className="block text-md font-bold text-gray-700">System message</label>
-            <div>
-              <textarea
-                placeholder="Describe desired model behavior (tone, tool usage, response style)"
-                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:border-gray-400"
-                value={systemPrompt}
-                onChange={(e) => setSystemPrompt(e.target.value)}
-              />
-            </div>
-          </div>
+          <PromptLayout.Content title="System message">
+            <textarea
+              placeholder="Describe desired model behavior (tone, tool usage, response style)"
+              className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:border-gray-400"
+              value={systemPrompt}
+              onChange={(e) => setSystemPrompt(e.target.value)}
+            />
+          </PromptLayout.Content>
 
           <Button className="w-full border-dashed">+ Add messages to describe task or add context</Button>
-        </div>
+        </PromptLayout.Left>
 
-        <div className="w-1/2 flex flex-col">
+        <PromptLayout.Right>
           {/* CHAT */}
           <div className="flex-1 p-6">
             <div className="h-full flex items-center justify-center text-gray-400">
@@ -200,8 +184,16 @@ const PromptPage = () => {
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </PromptLayout.Right>
+      </PromptLayout.Main>
+      {/* MODAL */}
+      <ToolsModal open={isOpenModal} onClose={() => setIsOpenModal(false)} onConfirm={onConfirmTools} tools={tools} />
+      <VectorStoreModal
+        open={vectorCollectionsOpen}
+        onClose={() => setVectorCollectionsOpen(false)}
+        onConfirm={onConfirmVectorCollections}
+        vectorCollections={vectorCollections}
+      />
     </div>
   );
 };
