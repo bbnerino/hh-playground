@@ -1,22 +1,21 @@
 "use client";
 import Button from "@/components/Button";
-import Chatting from "@/components/prompts/Chatting";
-import PromptHeader from "@/components/prompts/Header";
+import Chatting from "@/app/prompts/components/Chatting";
+import PromptHeader from "@/app/prompts/components/Header";
 import { Message } from "@/types/prompts/chat";
 import { PromptModel } from "@/types/prompts/model";
 import { PromptRequest } from "@/types/prompts/request";
 import React, { useEffect, useRef, useState } from "react";
-import ToolsModal from "./toolsModal";
+import ToolsModal from "./components/modal/toolsModal";
 import { Tool } from "@/types/prompts/tool";
-import VectorStoreModal from "./vectorStoreModal";
+import VectorStoreModal from "./components/modal/vectorStoreModal";
 import { VectorCollection } from "@/types/prompts/vectorStore";
+import SelectModel from "./components/SelectModel";
+import ItemButton from "./components/ItemButton";
 
 const PromptPage = () => {
-  const models = [
-    { name: "gpt-4.1", description: "text.format: text temp: 1.00 tokens: 2048 top_p: 1.00 store: true" },
-    { name: "gpt-4.1-mini", description: "text.format: text temp: 1.00 tokens: 2048 top_p: 1.00 store: true" }
-  ];
-  const [model, setModel] = useState<PromptModel>(models[0]);
+  // MODEL
+  const [model, setModel] = useState<PromptModel>(new PromptModel());
 
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -37,18 +36,11 @@ const PromptPage = () => {
 
   // CHATTING
   const [userPrompt, setUserPrompt] = useState("");
-  const chatRef = useRef<HTMLDivElement>(null);
-  const scrollDown = async () => {
-    chatRef?.current?.scrollTo({
-      top: chatRef.current.scrollHeight,
-      behavior: "smooth"
-    });
-  };
 
   const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.nativeEvent.isComposing) return;
 
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSendMessage(true);
     }
@@ -82,7 +74,7 @@ const PromptPage = () => {
     setVectorCollections(selectedVectorCollections);
   };
 
-  // 🟢 MAIN FUNCTION 
+  // 🟢 MAIN FUNCTION
   const onSendMessage = async (submit: boolean = true) => {
     setIsLoading(true);
     let _messages = [...messages];
@@ -99,10 +91,8 @@ const PromptPage = () => {
     });
     promptRequest.setTools(tools);
     promptRequest.setVectorCollections(vectorCollections);
-    scrollDown();
 
     const response = await promptRequest.request();
-    scrollDown();
     setMessages(response.messages);
     if (response.toolCalled) {
       setRequestTrigger(true);
@@ -115,46 +105,17 @@ const PromptPage = () => {
       <PromptHeader />
 
       <main className="flex h-[calc(100vh-4rem)]">
-        <PromptLayoutLeft>
+        <div className="w-1/2 border-r border-gray-300 p-6 flex flex-col gap-6">
           {/* MODEL */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Model</label>
-            <div className="relative">
-              <select
-                className="w-50 px-3 py-2 bg-white border border-gray-300 rounded-md appearance-none pr-10 focus:outline-none focus:border-gray-400 cursor-pointer"
-                value={model.name}
-                onChange={(e) => setModel(models.find((m) => m.name === e.target.value) as PromptModel)}
-              >
-                {models.map((model) => (
-                  <option key={model.name} value={model.name}>
-                    {model.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="mt-2">
-              <code className="text-sm text-gray-600">{model.description}</code>
-            </div>
-          </div>
+          <SelectModel model={model} setModel={setModel} />
 
           {/* TOOLS */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Tools</label>
+            <label className="block text-md font-bold text-gray-700">Tools</label>
             <div className="flex gap-2">
               <div className="flex flex-wrap gap-2">
                 {tools.map((tool, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200 cursor-pointer"
-                  >
-                    <span>{tool.function.name}</span>
-                    <button
-                      onClick={() => handleRemoveTool(tool.function.name)}
-                      className="cursor-pointer w-4 h-4 flex items-center justify-center hover:text-gray-600"
-                    >
-                      ×
-                    </button>
-                  </div>
+                  <ItemButton key={index} name={tool.function.name} handleRemoveTool={handleRemoveTool} />
                 ))}
               </div>
               <Button onClick={() => setIsOpenModal(true)}>+</Button>
@@ -169,22 +130,15 @@ const PromptPage = () => {
 
           {/* VECTOR STORE */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Vector Store</label>
+            <label className="block text-md font-bold text-gray-700">Vector Store</label>
             <div className="flex gap-2">
               <div className="flex flex-wrap gap-2">
                 {vectorCollections.map((vectorCollection, index) => (
-                  <div
+                  <ItemButton
                     key={index}
-                    className="flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200 cursor-pointer"
-                  >
-                    <span>{vectorCollection.name}</span>
-                    <button
-                      onClick={() => handleRemoveVectorCollection(vectorCollection.name)}
-                      className="cursor-pointer w-4 h-4 flex items-center justify-center hover:text-gray-600"
-                    >
-                      ×
-                    </button>
-                  </div>
+                    name={vectorCollection.name}
+                    handleRemoveTool={handleRemoveVectorCollection}
+                  />
                 ))}
               </div>
               <Button onClick={() => setVectorCollectionsOpen(true)}>+</Button>
@@ -199,7 +153,7 @@ const PromptPage = () => {
 
           {/* SYSTEM MESSAGE */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">System message</label>
+            <label className="block text-md font-bold text-gray-700">System message</label>
             <div>
               <textarea
                 placeholder="Describe desired model behavior (tone, tool usage, response style)"
@@ -210,12 +164,10 @@ const PromptPage = () => {
             </div>
           </div>
 
-          <div>
-            <Button className="w-full border-dashed">+ Add messages to describe task or add context</Button>
-          </div>
-        </PromptLayoutLeft>
+          <Button className="w-full border-dashed">+ Add messages to describe task or add context</Button>
+        </div>
 
-        <PromptLayoutRight>
+        <div className="w-1/2 flex flex-col">
           {/* CHAT */}
           <div className="flex-1 p-6">
             <div className="h-full flex items-center justify-center text-gray-400">
@@ -225,9 +177,7 @@ const PromptPage = () => {
                   <p className="mt-2">Your conversation will appear here</p>
                 </div>
               ) : (
-                <div className="chat-scroll w-full h-[calc(100vh-300px)] overflow-y-auto" ref={chatRef}>
-                  <Chatting messages={messages} isLoading={isLoading} />
-                </div>
+                <Chatting messages={messages} isLoading={isLoading} />
               )}
             </div>
           </div>
@@ -250,22 +200,10 @@ const PromptPage = () => {
               </div>
             </div>
           </div>
-        </PromptLayoutRight>
+        </div>
       </main>
     </div>
   );
-};
-
-const PromptLayoutLeft = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="w-1/2 border-r border-gray-300 p-6">
-      <div className="space-y-6">{children}</div>
-    </div>
-  );
-};
-
-const PromptLayoutRight = ({ children }: { children: React.ReactNode }) => {
-  return <div className="w-1/2 flex flex-col">{children}</div>;
 };
 
 export default PromptPage;
