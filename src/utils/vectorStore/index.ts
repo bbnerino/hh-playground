@@ -1,14 +1,3 @@
-// =============
-
-export const uploadVectorStore = async ({ name }: { name: string }) => {
-  const response = await fetch(`/api/vectorStore`, {
-    method: "POST",
-    body: JSON.stringify({ name })
-  });
-  const data = await response.json();
-  return data;
-};
-
 export const uploadVectorStoreFile = async ({ name, file }: { name: string; file: File }) => {
   if (!file) return;
 

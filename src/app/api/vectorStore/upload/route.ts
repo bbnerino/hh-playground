@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       payload: { text: chunk }
     }));
     await client.upsert(name, { wait: true, points });
-    return NextResponse.json({ success: true, count: points.length });
+    return NextResponse.json({ success: true, count: points.length, name });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || "Failed to upload to vector store" }, { status: 500 });
   }

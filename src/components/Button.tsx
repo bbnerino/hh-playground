@@ -21,7 +21,7 @@ const Button = ({ children, variant = "primary", className = "", ...props }: But
   }
 
   return (
-    <button {...props} className={`cursor-pointer px-4 py-1.5 text-sm rounded-md ${variantClass} ${className}`}>
+    <button {...props} className={`cursor-pointer h-fit px-4 py-1.5 text-sm rounded-md ${variantClass} ${className}`}>
       {children}
     </button>
   );

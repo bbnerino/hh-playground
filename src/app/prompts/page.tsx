@@ -11,6 +11,7 @@ import ToolsModal from "./toolsModal";
 import { Tool } from "@/types/prompts/tool";
 import { getWeather } from "@/utils/prompts/tools/getWeather";
 import VectorStoreModal from "./vectorStoreModal";
+import { VectorCollection } from "@/types/prompts/vectorStore";
 
 const PromptPage = () => {
   const models = [
@@ -94,9 +95,18 @@ const PromptPage = () => {
     setTools(tools.filter((tool) => tool.function.name !== toolName));
   };
 
-  const [vectorStores, setVectorStores] = useState<Tool[]>([]);
-  const handleRemoveVectorStore = (vectorStoreName: string) => {
-    setVectorStores(vectorStores.filter((vectorStore) => vectorStore.function.name !== vectorStoreName));
+  // VECTOR STORE
+
+  const [vectorCollections, setVectorCollections] = useState<VectorCollection[]>([]);
+
+  const handleRemoveVectorCollection = (vectorCollectionName: string) => {
+    setVectorCollections(
+      vectorCollections.filter((vectorCollection) => vectorCollection.name !== vectorCollectionName)
+    );
+  };
+  const handleModalConfirmVectorCollection = (selectedVectorCollections: VectorCollection[]) => {
+    setIsOpenModal(false);
+    setVectorCollections(selectedVectorCollections);
   };
 
   return (
@@ -161,14 +171,14 @@ const PromptPage = () => {
             <label className="block text-sm font-medium text-gray-700">Vector Store</label>
             <div className="flex gap-2">
               <div className="flex flex-wrap gap-2">
-                {vectorStores.map((vectorStore) => (
+                {vectorCollections.map((vectorCollection) => (
                   <div
-                    key={vectorStore.function.name}
+                    key={vectorCollection.name}
                     className="flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200 cursor-pointer"
                   >
-                    <span>{vectorStore.function.name}</span>
+                    <span>{vectorCollection.name}</span>
                     <button
-                      onClick={() => handleRemoveVectorStore(vectorStore.function.name)}
+                      onClick={() => handleRemoveVectorCollection(vectorCollection.name)}
                       className="cursor-pointer w-4 h-4 flex items-center justify-center hover:text-gray-600"
                     >
                       ×
@@ -180,8 +190,8 @@ const PromptPage = () => {
               <VectorStoreModal
                 open={isOpenModal}
                 onClose={() => setIsOpenModal(false)}
-                onConfirm={handleModalConfirm}
-                tools={vectorStores}
+                onConfirm={handleModalConfirmVectorCollection}
+                vectorCollections={vectorCollections}
               />
             </div>
           </div>

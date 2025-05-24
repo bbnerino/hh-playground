@@ -13,7 +13,7 @@ const Modal = ({ open, onClose, onConfirm, children }: ModalProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/50" onClick={onClose}>
       <div
-        className="bg-white rounded-lg shadow-lg w-[500px] h-[300px] flex flex-col p-6 relative"
+        className="bg-white rounded-lg shadow-lg w-[500px] min-h-[300px] flex flex-col p-6 relative pb-15"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex-1 overflow-auto">{children}</div>
