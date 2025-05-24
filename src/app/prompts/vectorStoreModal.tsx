@@ -18,13 +18,6 @@ const VectorStoreModal = (props: ModalProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedDescription, setSelectedDescription] = useState<string>("");
 
-  const handleSelectTool = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = props.vectorCollections.find((collection) => collection.name === e.target.value);
-    if (selected && !selectedCollections.find((t) => t.name === selected.name)) {
-      setSelectedCollections([...selectedCollections, selected]);
-    }
-  };
-
   const handleRemoveTool = (toolName: string) => {
     setSelectedCollections(selectedCollections.filter((collection) => collection.name !== toolName));
   };
@@ -50,10 +43,67 @@ const VectorStoreModal = (props: ModalProps) => {
     }
   };
 
+  const [vectorCollections, setVectorCollections] = useState<VectorCollection[]>([]);
+
+  const fetchVectorCollections = async () => {
+    const response = await fetch("/api/vectorStore/searchDocuments/all");
+    const data = await response.json();
+    console.log(data);
+    setVectorCollections(data.collections || []);
+  };
+
+  useEffect(() => {
+    if (props.open) {
+      fetchVectorCollections();
+    }
+  }, [props.open]);
+
+  const handleSelectVectorCollection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = vectorCollections.find((collection) => collection.name === e.target.value);
+    if (selected && !selectedCollections.find((t) => t.name === selected.name)) {
+      setSelectedCollections([...selectedCollections, selected]);
+    }
+  };
+
   return (
     <Modal {...props} onConfirm={() => props.onConfirm(selectedCollections)}>
       <div className="flex flex-col gap-2 mt-4">
-        <label className="block text-lg font-medium text-gray-700 mb-1">md 파일 업로드</label>
+        <label className="block text-lg font-medium text-gray-700 mb-1">벡터 컬렉션 선택</label>
+        <select
+          className="block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md focus:outline-none hover:bg-gray-200 cursor-pointer"
+          onChange={handleSelectVectorCollection}
+        >
+          <option value="">선택</option>
+          {vectorCollections?.map((collection) => (
+            <option key={collection.name} value={collection.name}>
+              {collection.name}
+            </option>
+          ))}
+        </select>
+
+        {selectedFile && (
+          <>
+            <label className="block text-lg font-medium text-gray-700 mb-1">벡터 컬렉션 설명</label>
+            <input
+              type="text"
+              value={selectedDescription}
+              onChange={(e) => setSelectedDescription(e.target.value)}
+              className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none"
+            />
+          </>
+        )}
+
+        {selectedFile && (
+          <>
+            <div className="text-xs text-gray-600 mt-1">선택된 파일: {selectedFile.name}</div>
+            <Button variant="primary" className="mt-2 w-fit" onClick={fileUpload} disabled={!selectedFile}>
+              업로드
+            </Button>
+          </>
+        )}
+      </div>
+      <div className="flex flex-col gap-2 mt-4">
+        <label className="block text-lg font-medium text-gray-700 mb-1">md 파일 추가</label>
         <input
           type="file"
           accept=".md"

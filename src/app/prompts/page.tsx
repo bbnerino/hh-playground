@@ -27,32 +27,6 @@ const PromptPage = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSendMessage = async (submit: boolean = true) => {
-    setIsLoading(true);
-    let _messages = [...messages];
-    if (submit) {
-      _messages = [...messages, new Message(userPrompt, "user")];
-      setMessages(_messages);
-      setUserPrompt("");
-    }
-
-    const promptRequest = new PromptRequest({
-      model: model.name,
-      messages: _messages,
-      systemPrompt
-    });
-    promptRequest.setTools(tools);
-    scrollDown();
-
-    const response = await promptRequest.request();
-    scrollDown();
-    setMessages(response.messages);
-    if (response.toolCalled) {
-      setRequestTrigger(true);
-    }
-    setIsLoading(false);
-  };
-
   const [requestTrigger, setRequestTrigger] = useState(false);
   useEffect(() => {
     if (requestTrigger) {
@@ -96,6 +70,7 @@ const PromptPage = () => {
   // VECTOR STORE
 
   const [vectorCollections, setVectorCollections] = useState<VectorCollection[]>([]);
+  const [vectorCollectionsOpen, setVectorCollectionsOpen] = useState(false);
 
   const handleRemoveVectorCollection = (vectorCollectionName: string) => {
     setVectorCollections(
@@ -103,8 +78,36 @@ const PromptPage = () => {
     );
   };
   const handleModalConfirmVectorCollection = (selectedVectorCollections: VectorCollection[]) => {
-    setIsOpenModal(false);
+    setVectorCollectionsOpen(false);
     setVectorCollections(selectedVectorCollections);
+  };
+
+  // 🟢 MAIN FUNCTION 
+  const onSendMessage = async (submit: boolean = true) => {
+    setIsLoading(true);
+    let _messages = [...messages];
+    if (submit) {
+      _messages = [...messages, new Message(userPrompt, "user")];
+      setMessages(_messages);
+      setUserPrompt("");
+    }
+
+    const promptRequest = new PromptRequest({
+      model: model.name,
+      messages: _messages,
+      systemPrompt
+    });
+    promptRequest.setTools(tools);
+    promptRequest.setVectorCollections(vectorCollections);
+    scrollDown();
+
+    const response = await promptRequest.request();
+    scrollDown();
+    setMessages(response.messages);
+    if (response.toolCalled) {
+      setRequestTrigger(true);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -139,9 +142,9 @@ const PromptPage = () => {
             <label className="block text-sm font-medium text-gray-700">Tools</label>
             <div className="flex gap-2">
               <div className="flex flex-wrap gap-2">
-                {tools.map((tool) => (
+                {tools.map((tool, index) => (
                   <div
-                    key={tool.function.name}
+                    key={index}
                     className="flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200 cursor-pointer"
                   >
                     <span>{tool.function.name}</span>
@@ -169,9 +172,9 @@ const PromptPage = () => {
             <label className="block text-sm font-medium text-gray-700">Vector Store</label>
             <div className="flex gap-2">
               <div className="flex flex-wrap gap-2">
-                {vectorCollections.map((vectorCollection) => (
+                {vectorCollections.map((vectorCollection, index) => (
                   <div
-                    key={vectorCollection.name}
+                    key={index}
                     className="flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200 cursor-pointer"
                   >
                     <span>{vectorCollection.name}</span>
@@ -184,10 +187,10 @@ const PromptPage = () => {
                   </div>
                 ))}
               </div>
-              <Button onClick={() => setIsOpenModal(true)}>+</Button>
+              <Button onClick={() => setVectorCollectionsOpen(true)}>+</Button>
               <VectorStoreModal
-                open={isOpenModal}
-                onClose={() => setIsOpenModal(false)}
+                open={vectorCollectionsOpen}
+                onClose={() => setVectorCollectionsOpen(false)}
                 onConfirm={handleModalConfirmVectorCollection}
                 vectorCollections={vectorCollections}
               />

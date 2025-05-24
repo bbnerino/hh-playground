@@ -1,6 +1,8 @@
 import { toolExecute } from "@/utils/prompts/tools";
 import { Message } from "./chat";
 import { Tool, ToolCall } from "./tool";
+import { VectorCollection } from "./vectorStore";
+import { searchDocumentsFunctionData } from "@/utils/prompts/tools/searchDocuments";
 
 export class PromptRequest {
   model: string = "";
@@ -11,23 +13,28 @@ export class PromptRequest {
   top_p: number = 1;
   store: boolean = true;
 
-  systemPrompt?: string = "";
-
   constructor({ model, messages, systemPrompt }: { model: string; messages: Message[]; systemPrompt?: string }) {
     this.model = model;
     this.messages = messages;
-    this.systemPrompt = systemPrompt;
+
+    this.setSystemPrompt(systemPrompt);
   }
 
   // tool 추가
   setTools(tools: Tool[]) {
-    this.tools = tools;
+    this.tools = [...tools];
+  }
+
+  setVectorCollections(vectorCollections: VectorCollection[]) {
+    console.log("vectorCollections", vectorCollections);
+    if (vectorCollections.length > 0) {
+      this.tools.push(searchDocumentsFunctionData(vectorCollections));
+    }
   }
 
   public async request(): Promise<{ toolCalled: boolean; messages: Message[] }> {
     // LLM 호출 (API Route 활용)
 
-    this.setSystemPrompt();
     const requestData = {
       model: this.model,
       messages: this.messages,
@@ -119,8 +126,8 @@ export class PromptRequest {
     };
   }
 
-  private setSystemPrompt() {
-    if (!this.systemPrompt) {
+  private setSystemPrompt(systemPrompt?: string) {
+    if (!systemPrompt) {
       // 시스템 프롬프트가 없는데, 첫번째에 있는 경우 -> 없앤다.
       if (this.messages[0].role === "system") {
         this.messages = this.messages.slice(1);
@@ -130,12 +137,12 @@ export class PromptRequest {
 
     // message의 첫 번째 메시지가 system 메시지인 경우, systemPrompt를 변경
     if (this.messages[0].role === "system") {
-      this.messages[0].content = this.systemPrompt;
+      this.messages[0].content = systemPrompt;
     }
 
     // message의 첫 번째 메시지가 system 메시지가 아닐 경우 시스템 프롬프트를 추가
     if (this.messages[0].role !== "system") {
-      const systemMessage = new Message(this.systemPrompt, "system");
+      const systemMessage = new Message(systemPrompt, "system");
       this.messages.unshift(systemMessage);
     }
   }
