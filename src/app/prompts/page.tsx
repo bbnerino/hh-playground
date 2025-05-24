@@ -10,6 +10,7 @@ import Modal from "@/components/modal";
 import ToolsModal from "./toolsModal";
 import { Tool } from "@/types/prompts/tool";
 import { getWeather } from "@/utils/prompts/tools/getWeather";
+import VectorStoreModal from "./vectorStoreModal";
 
 const PromptPage = () => {
   const models = [
@@ -93,6 +94,11 @@ const PromptPage = () => {
     setTools(tools.filter((tool) => tool.function.name !== toolName));
   };
 
+  const [vectorStores, setVectorStores] = useState<Tool[]>([]);
+  const handleRemoveVectorStore = (vectorStoreName: string) => {
+    setVectorStores(vectorStores.filter((vectorStore) => vectorStore.function.name !== vectorStoreName));
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <PromptHeader />
@@ -141,7 +147,42 @@ const PromptPage = () => {
                 ))}
               </div>
               <Button onClick={() => setIsOpenModal(true)}>+</Button>
-              {/* <Button onClick={onClickTool}>+</Button> */}
+              <ToolsModal
+                open={isOpenModal}
+                onClose={() => setIsOpenModal(false)}
+                onConfirm={handleModalConfirm}
+                tools={tools}
+              />
+            </div>
+          </div>
+
+          {/* VECTOR STORE */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Vector Store</label>
+            <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                {vectorStores.map((vectorStore) => (
+                  <div
+                    key={vectorStore.function.name}
+                    className="flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200 cursor-pointer"
+                  >
+                    <span>{vectorStore.function.name}</span>
+                    <button
+                      onClick={() => handleRemoveVectorStore(vectorStore.function.name)}
+                      className="cursor-pointer w-4 h-4 flex items-center justify-center hover:text-gray-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <Button onClick={() => setIsOpenModal(true)}>+</Button>
+              <VectorStoreModal
+                open={isOpenModal}
+                onClose={() => setIsOpenModal(false)}
+                onConfirm={handleModalConfirm}
+                tools={vectorStores}
+              />
             </div>
           </div>
 
@@ -200,13 +241,6 @@ const PromptPage = () => {
           </div>
         </PromptLayoutRight>
       </main>
-
-      <ToolsModal
-        open={isOpenModal}
-        onClose={() => setIsOpenModal(false)}
-        onConfirm={handleModalConfirm}
-        tools={tools}
-      />
     </div>
   );
 };
