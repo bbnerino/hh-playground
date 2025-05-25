@@ -54,6 +54,7 @@ const VectorStoreModal = (props: ModalProps) => {
 
   useEffect(() => {
     if (props.open) {
+      setSelectedFile(null);
       fetchVectorCollections();
     }
   }, [props.open]);
@@ -68,7 +69,41 @@ const VectorStoreModal = (props: ModalProps) => {
   return (
     <Modal {...props} onConfirm={() => props.onConfirm(selectedCollections)}>
       <div className="flex flex-col gap-2 mt-4">
-        <label className="block text-lg font-medium text-gray-700 mb-1">벡터 컬렉션 선택</label>
+        {selectedFile ? (
+          <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md">
+            <label className="block text-lg font-medium text-gray-700 mb-1">파일 추가 설명</label>
+            <input
+              type="text"
+              value={selectedDescription}
+              onChange={(e) => setSelectedDescription(e.target.value)}
+              className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none"
+            />
+            <div className="text-xs text-gray-600 mt-1">선택된 파일: {selectedFile.name}</div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="primary" className="mt-2 w-fit" onClick={() => setSelectedFile(null)}>
+                취소
+              </Button>
+              <Button variant="secondary" className="mt-2 w-fit" onClick={fileUpload} disabled={!selectedFile}>
+                업로드
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2 mt-4">
+            <label className="block text-lg font-medium text-gray-700 mb-1">파일 추가</label>
+            <input
+              type="file"
+              accept=".md"
+              onChange={handleFileChange}
+              readOnly
+              className="block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md focus:outline-none hover:bg-gray-200 cursor-pointer"
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4">
+        <div className="text-lg font-medium text-gray-700 mb-1">벡터 컬렉션</div>
         <select
           className="block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md focus:outline-none hover:bg-gray-200 cursor-pointer"
           onChange={handleSelectVectorCollection}
@@ -80,61 +115,6 @@ const VectorStoreModal = (props: ModalProps) => {
             </option>
           ))}
         </select>
-
-        {selectedFile && (
-          <>
-            <label className="block text-lg font-medium text-gray-700 mb-1">벡터 컬렉션 설명</label>
-            <input
-              type="text"
-              value={selectedDescription}
-              onChange={(e) => setSelectedDescription(e.target.value)}
-              className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none"
-            />
-          </>
-        )}
-
-        {selectedFile && (
-          <>
-            <div className="text-xs text-gray-600 mt-1">선택된 파일: {selectedFile.name}</div>
-            <Button variant="primary" className="mt-2 w-fit" onClick={fileUpload} disabled={!selectedFile}>
-              업로드
-            </Button>
-          </>
-        )}
-      </div>
-      <div className="flex flex-col gap-2 mt-4">
-        <label className="block text-lg font-medium text-gray-700 mb-1">md 파일 추가</label>
-        <input
-          type="file"
-          accept=".md"
-          onChange={handleFileChange}
-          className="block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md focus:outline-none hover:bg-gray-200 cursor-pointer"
-        />
-
-        {selectedFile && (
-          <>
-            <label className="block text-lg font-medium text-gray-700 mb-1">벡터 컬렉션 설명</label>
-            <input
-              type="text"
-              value={selectedDescription}
-              onChange={(e) => setSelectedDescription(e.target.value)}
-              className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none"
-            />
-          </>
-        )}
-
-        {selectedFile && (
-          <>
-            <div className="text-xs text-gray-600 mt-1">선택된 파일: {selectedFile.name}</div>
-            <Button variant="primary" className="mt-2 w-fit" onClick={fileUpload} disabled={!selectedFile}>
-              업로드
-            </Button>
-          </>
-        )}
-      </div>
-
-      <div className="mt-4">
-        <div className="text-lg font-medium text-gray-700 mb-1">벡터 컬렉션</div>
         <div className="flex flex-wrap gap-2 mt-4">
           {selectedCollections.map((collection) => (
             <div
