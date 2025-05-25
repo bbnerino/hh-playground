@@ -37,3 +37,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message || "Failed to upload to vector store" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  const { name } = await req.json();
+  console.log("🔵",name);
+  const client = new QdrantClient({ url: BASIC_URL, port: 6333, apiKey: process.env.QDRANT_API_KEY });
+  await client.deleteCollection(name);
+  return NextResponse.json({ success: true });
+}

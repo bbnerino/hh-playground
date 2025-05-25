@@ -12,7 +12,7 @@ interface ModalProps {
   vectorCollections: VectorCollection[];
 }
 
-const VectorStoreModal = (props: ModalProps) => {
+const VectorCollectionModal = (props: ModalProps) => {
   const [selectedCollections, setSelectedCollections] = useState<VectorCollection[]>(props.vectorCollections);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -136,4 +136,4 @@ const VectorStoreModal = (props: ModalProps) => {
   );
 };
 
-export default VectorStoreModal;
+export default VectorCollectionModal;

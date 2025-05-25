@@ -10,7 +10,7 @@ export const uploadVectorStoreFile = async ({ name, file }: { name: string; file
       throw new Error("Failed to generate embeddings");
     }
 
-    const response = await fetch(`/api/vectorStore/upload`, {
+    const response = await fetch(`/api/vectorStore`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

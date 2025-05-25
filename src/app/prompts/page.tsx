@@ -8,7 +8,7 @@ import { PromptRequest } from "@/types/prompts/request";
 import React, { useEffect, useRef, useState } from "react";
 import ToolsModal from "./components/modal/toolsModal";
 import { Tool } from "@/types/prompts/tool";
-import VectorStoreModal from "./components/modal/vectorStoreModal";
+import VectorCollectionModal from "./components/modal/vectorCollectionModal";
 import { VectorCollection } from "@/types/prompts/vectorStore";
 import SelectModel from "./components/SelectModel";
 import ItemButton from "./components/ItemButton";
@@ -202,7 +202,7 @@ const PromptPage = () => {
       </PromptLayout.Main>
       {/* MODAL */}
       <ToolsModal open={isOpenModal} onClose={() => setIsOpenModal(false)} onConfirm={onConfirmTools} tools={tools} />
-      <VectorStoreModal
+      <VectorCollectionModal
         open={vectorCollectionsOpen}
         onClose={() => setVectorCollectionsOpen(false)}
         onConfirm={onConfirmVectorCollections}

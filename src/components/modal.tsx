@@ -4,7 +4,7 @@ import Button from "./Button";
 interface ModalProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm?: () => void;
   children?: React.ReactNode;
 }
 
@@ -19,9 +19,11 @@ const Modal = ({ open, onClose, onConfirm, children }: ModalProps) => {
         <div className="flex-1 overflow-auto">{children}</div>
         <div className="absolute bottom-4 right-6 flex gap-2">
           <Button onClick={onClose}>취소</Button>
-          <Button variant="secondary" onClick={onConfirm}>
-            확인
-          </Button>
+          {onConfirm && (
+            <Button variant="secondary" onClick={onConfirm}>
+              확인
+            </Button>
+          )}
         </div>
       </div>
     </div>
