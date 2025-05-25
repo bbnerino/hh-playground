@@ -3,6 +3,7 @@ import { Message } from "./chat";
 import { Tool, ToolCall } from "./tool";
 import { VectorCollection } from "./vectorStore";
 import { searchDocumentsFunctionData } from "@/utils/prompts/tools/searchDocuments";
+import { reactPrompt } from "@/utils/prompts/reactPrompt";
 
 export class PromptRequest {
   model: string = "";
@@ -12,28 +13,60 @@ export class PromptRequest {
   temperature: number = 1;
   top_p: number = 1;
   store: boolean = true;
+  systemPrompt: string = "";
+  isReActMode: boolean = false;
 
-  constructor({ model, messages, systemPrompt }: { model: string; messages: Message[]; systemPrompt?: string }) {
+  constructor({
+    model,
+    messages,
+    systemPrompt,
+    isReActMode
+  }: {
+    model: string;
+    messages: Message[];
+    systemPrompt: string;
+    isReActMode: boolean;
+  }) {
     this.model = model;
     this.messages = messages;
-
-    this.setSystemPrompt(systemPrompt);
+    this.systemPrompt = systemPrompt;
+    this.isReActMode = isReActMode;
+    // this.setSystemPrompt(systemPrompt);
   }
 
   // tool 추가
   setTools(tools: Tool[]) {
     this.tools = [...tools];
   }
-
   setVectorCollections(vectorCollections: VectorCollection[]) {
-    console.log("vectorCollections", vectorCollections);
     if (vectorCollections.length > 0) {
       this.tools.push(searchDocumentsFunctionData(vectorCollections));
     }
   }
 
+  setReActMode() {
+    // system prompt 에 다음 문구 추가
+    if (this.isReActMode) {
+      this.systemPrompt = reactPrompt + "\n\n" + this.systemPrompt;
+    }
+  }
+
+  private setSystemPrompt() {
+    // messages 의 0 번은 무조건 system 메시지
+    this.setReActMode();
+
+    if (this.messages[0].role === "system") {
+      this.messages[0].content = this.systemPrompt;
+    } else {
+      const systemMessage = new Message(this.systemPrompt, "system");
+      this.messages.unshift(systemMessage);
+    }
+  }
+
   public async request(): Promise<{ toolCalled: boolean; messages: Message[] }> {
     // LLM 호출 (API Route 활용)
+
+    this.setSystemPrompt();
 
     const requestData = {
       model: this.model,
@@ -126,27 +159,6 @@ export class PromptRequest {
     };
   }
 
-  private setSystemPrompt(systemPrompt?: string) {
-    if (!systemPrompt) {
-      // 시스템 프롬프트가 없는데, 첫번째에 있는 경우 -> 없앤다.
-      if (this.messages[0].role === "system") {
-        this.messages = this.messages.slice(1);
-      }
-      return;
-    }
-
-    // message의 첫 번째 메시지가 system 메시지인 경우, systemPrompt를 변경
-    if (this.messages[0].role === "system") {
-      this.messages[0].content = systemPrompt;
-    }
-
-    // message의 첫 번째 메시지가 system 메시지가 아닐 경우 시스템 프롬프트를 추가
-    if (this.messages[0].role !== "system") {
-      const systemMessage = new Message(systemPrompt, "system");
-      this.messages.unshift(systemMessage);
-    }
-  }
-
   private async fetch(data: any) {
     const res = await fetch("/api/gpt", {
       method: "POST",
@@ -156,14 +168,4 @@ export class PromptRequest {
 
     return res;
   }
-}
-
-export interface IPromptRequest {
-  model: string;
-  messages: Message[];
-  tools: Tool[];
-  temperature: number;
-  top_p: number;
-  store: boolean;
-  tool_choice: string;
 }

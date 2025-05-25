@@ -50,7 +50,7 @@ const ChattingMessage = ({
   );
 
   processedMessage = processedMessage?.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-
+  if (role === "system") return null;
   return (
     <div className="flex flex-col border border-transparent p-2 gap-2 cursor-pointer hover:border hover:border-gray-300 hover:rounded-md max-w-xl break-words">
       <div className="text-sm text-gray-500">{mapRole[role]}</div>

@@ -18,35 +18,6 @@ const PromptPage = () => {
   // MODEL
   const [model, setModel] = useState<PromptModel>(new PromptModel());
 
-  const [messages, setMessages] = useState<Message[]>([]);
-
-  // 시스템 프롬프트
-  const [systemPrompt, setSystemPrompt] = useState<string>("");
-
-  // 입력
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [requestTrigger, setRequestTrigger] = useState(false);
-  useEffect(() => {
-    if (requestTrigger) {
-      setRequestTrigger(false);
-      onSendMessage(false);
-    }
-  }, [requestTrigger]);
-
-  // CHATTING
-  const [userPrompt, setUserPrompt] = useState("");
-
-  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (e.nativeEvent.isComposing) return;
-
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      onSendMessage(true);
-    }
-  };
-
   // TOOLS
   const [tools, setTools] = useState<Tool[]>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -65,21 +36,50 @@ const PromptPage = () => {
   const [vectorCollections, setVectorCollections] = useState<VectorCollection[]>([]);
   const [vectorCollectionsOpen, setVectorCollectionsOpen] = useState(false);
 
+  const onConfirmVectorCollections = (selectedVectorCollections: VectorCollection[]) => {
+    setVectorCollectionsOpen(false);
+    setVectorCollections(selectedVectorCollections);
+  };
   const handleRemoveVectorCollection = (vectorCollectionName: string) => {
     setVectorCollections(
       vectorCollections.filter((vectorCollection) => vectorCollection.name !== vectorCollectionName)
     );
   };
-  const onConfirmVectorCollections = (selectedVectorCollections: VectorCollection[]) => {
-    setVectorCollectionsOpen(false);
-    setVectorCollections(selectedVectorCollections);
+
+  // ReAct Mode
+  const [isReActMode, setIsReActMode] = useState(false);
+
+  // 시스템 프롬프트
+  const [systemPrompt, setSystemPrompt] = useState<string>("");
+
+  // CHATTING
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [userPrompt, setUserPrompt] = useState("");
+
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (e.nativeEvent.isComposing) return;
+
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSendMessage(true);
+    }
   };
 
-  // 🟢 MAIN FUNCTION
-  const onSendMessage = async (submit: boolean = true) => {
+  // SUBMIT
+  const [isLoading, setIsLoading] = useState(false);
+  const [requestTrigger, setRequestTrigger] = useState(false);
+  useEffect(() => {
+    if (requestTrigger) {
+      setRequestTrigger(false);
+      onSendMessage(false);
+    }
+  }, [requestTrigger]);
+
+  // 🟢 SUBMIT
+  const onSendMessage = async (isInitialMessage: boolean = true) => {
     setIsLoading(true);
     let _messages = [...messages];
-    if (submit) {
+    if (isInitialMessage) {
       _messages = [...messages, new Message(userPrompt, "user")];
       setMessages(_messages);
       setUserPrompt("");
@@ -88,7 +88,8 @@ const PromptPage = () => {
     const promptRequest = new PromptRequest({
       model: model.name,
       messages: _messages,
-      systemPrompt
+      systemPrompt,
+      isReActMode
     });
     promptRequest.setTools(tools);
     promptRequest.setVectorCollections(vectorCollections);
@@ -135,6 +136,19 @@ const PromptPage = () => {
                 ))}
               </div>
               <Button onClick={() => setVectorCollectionsOpen(true)}>+</Button>
+            </div>
+          </PromptLayout.Content>
+
+          {/* ReAct Mode */}
+          <PromptLayout.Content title="ReAct Mode">
+            <div className="flex gap-2">
+              {/*  CHECK */}
+              <input
+                type="checkbox"
+                checked={isReActMode}
+                onChange={() => setIsReActMode(!isReActMode)}
+                className="w-5 h-5 cursor-pointer"
+              />
             </div>
           </PromptLayout.Content>
 
