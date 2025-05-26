@@ -47,7 +47,7 @@ const PromptPage = () => {
   };
 
   // ReAct Mode
-  const [isReActMode, setIsReActMode] = useState(false);
+  const [isReActMode, setIsReActMode] = useState(true);
 
   // 시스템 프롬프트
   const [systemPrompt, setSystemPrompt] = useState<string>("");

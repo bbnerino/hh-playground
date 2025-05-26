@@ -1,8 +1,8 @@
-import { toolExecute } from "@/utils/prompts/tools";
+import { toolExecute } from "@/utils/tools";
 import { Message } from "./chat";
 import { Tool, ToolCall } from "./tool";
 import { VectorCollection } from "./vectorStore";
-import { searchDocumentsFunctionData } from "@/utils/prompts/tools/searchDocuments";
+import { searchDocumentsFunctionData } from "@/utils/tools/searchDocuments";
 import { reactPrompt } from "@/utils/prompts/reactPrompt";
 
 export class PromptRequest {

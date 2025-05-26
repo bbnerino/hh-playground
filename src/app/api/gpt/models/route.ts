@@ -5,7 +5,10 @@ export async function GET() {
     {
       models: [
         { name: "gpt-4.1", description: "temp: 1.00 tokens: 2048 top_p: 1.00 store: true" },
-        { name: "gpt-4.1-mini", description: "temp: 1.00 tokens: 2048 top_p: 1.00 store: true" }
+        { name: "gpt-4.1-mini", description: "temp: 1.00 tokens: 2048 top_p: 1.00 store: true" },
+        { name: "gpt-4.0", description: "temp: 1.00 tokens: 2048 top_p: 1.00 store: true" },
+        { name: "gpt-3.5-turbo", description: "temp: 1.00 tokens: 2048 top_p: 1.00 store: true" },
+        { name: "o3", description: "temp: 1.00 tokens: 2048 top_p: 1.00 store: true" }
       ]
     },
     { status: 200 }

@@ -74,9 +74,10 @@ const VectorStoreModal = (props: ModalProps) => {
         <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md">
           <div className="font-bold mb-2">상품번호: {props.productId}</div>
           <div className="font-bold mb-2">상품명: {productName}</div>
+          <div className="font-medium text-sm mb-2">콜렉션: {props.productId}-{productName}</div>
           <div className="mb-2">리뷰 개수: {reviewList.length}</div>
           <Button variant="secondary" onClick={handleUpload} disabled={isUploading}>
-            {isUploading ? "업로드 중..." : "이 상품 리뷰를 벡터스토어에 업로드"}
+            {isUploading ? "업로드 중..." : "벡터스토어 업로드"}
           </Button>
         </div>
         <div>

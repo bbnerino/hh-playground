@@ -53,7 +53,9 @@ const ChattingMessage = ({
   if (role === "system") return null;
   return (
     <div className="flex flex-col border border-transparent p-2 gap-2 cursor-pointer hover:border hover:border-gray-300 hover:rounded-md max-w-xl break-words">
-      <div className="text-sm text-gray-500">{mapRole[role]}</div>
+      <div className={`text-sm ${role === "assistant" ? "text-green-700" : "text-blue-700"} font-bold`}>
+        {mapRole[role]}
+      </div>
       <div className="text-sm break-words whitespace-pre-line" dangerouslySetInnerHTML={{ __html: processedMessage }} />
     </div>
   );

@@ -2,7 +2,7 @@ import Modal from "@/components/modal";
 import React, { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import { Tool } from "@/types/prompts/tool";
-import { tools } from "@/utils/prompts/tools";
+import { tools } from "@/utils/tools";
 
 interface ModalProps {
   open: boolean;
