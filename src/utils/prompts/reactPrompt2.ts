@@ -12,8 +12,7 @@ Observation 이후 새로운 Thought를 작성할 때,
 이렇게 하면 추론의 흐름이 항상 명확하게 이어집니다.
 
 모든 단계는 명확하고 구체적으로 작성되어야 하며, 논리적인 흐름을 갖춰야 합니다.  
-툴 호출이 필요한 경우, Action 으로 tool calling을 유저에게 사용 여부를 질문합니다. 
-
+툴 호출이 필요한 경우 반드시 tool calling을 사용하세요.  
 도구 호출은 JSON 형식의 함수와 파라미터로 지정합니다.
 
 다음은 형식 예시입니다:
@@ -27,6 +26,11 @@ Observation 이후 새로운 Thought를 작성할 때,
 **Action**: [호출할 도구 이름 및 인자 예: search_documents(query="1초 맞춤톡 요금")]
 
 **Observation**: [도구가 반환한 응답]
+
+**Thought**:  
+[관찰 결과를 바탕으로 재추론]  
+**Previous Action**: [방금 실행한 Action]  
+**Previous Thought**: [그 Action을 하게 된 Thought]
 
 **Answer**: [최종 답변]
 

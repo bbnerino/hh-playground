@@ -11,8 +11,6 @@ export class PromptRequest {
 
   tools: Tool[] = [];
   temperature: number = 1;
-  top_p: number = 1;
-  store: boolean = true;
   systemPrompt: string = "";
   isReActMode: boolean = false;
 
@@ -73,8 +71,6 @@ export class PromptRequest {
       messages: this.messages,
       tools: this.tools,
       temperature: this.temperature,
-      top_p: this.top_p,
-      store: this.store,
       tool_choice: "auto"
     };
 

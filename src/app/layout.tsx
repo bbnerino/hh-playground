@@ -29,7 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryClientProviderWrapper>
-          {children}
+        {children}
         </QueryClientProviderWrapper>
       </body>
     </html>
