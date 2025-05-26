@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
       model: "text-embedding-ada-002",
       input: texts
     });
+    console.log("response", response);
 
     const embeddings = response.data.map((item: any) => item.embedding);
 

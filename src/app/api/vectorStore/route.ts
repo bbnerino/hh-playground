@@ -40,7 +40,6 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const { name } = await req.json();
-  console.log("🔵",name);
   const client = new QdrantClient({ url: BASIC_URL, port: 6333, apiKey: process.env.QDRANT_API_KEY });
   await client.deleteCollection(name);
   return NextResponse.json({ success: true });

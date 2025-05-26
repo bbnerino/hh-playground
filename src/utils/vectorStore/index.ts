@@ -1,8 +1,16 @@
-export const uploadVectorStoreFile = async ({ name, file }: { name: string; file: File }) => {
-  if (!file) return;
+export const uploadVectorStoreFile = async ({
+  name,
+  text: originalText,
+  file
+}: {
+  name: string;
+  file?: File;
+  text?: string;
+}) => {
+  if (!file && !originalText) return;
 
   try {
-    const text = await file.text();
+    const text = originalText || (file && (await file.text())) || "";
     const chunks = splitText(text);
     const embeddings = await getEmbeddings(chunks);
 

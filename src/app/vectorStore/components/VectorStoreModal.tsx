@@ -52,9 +52,8 @@ const VectorStoreModal = (props: ModalProps) => {
     setIsUploading(true);
     // 리뷰상세내용들을 합쳐서 하나의 텍스트 파일로 만듦
     const content = reviewList.join("\n\n");
-    const blob = new Blob([content], { type: "text/plain" });
-    const file = new File([blob], `${props.productId}-${productName}.txt`, { type: "text/plain" });
-    const response = await uploadVectorStoreFile({ name: `${props.productId}-${productName}`, file });
+
+    const response = await uploadVectorStoreFile({ name: `${props.productId}-${productName}`, text: content });
 
     setIsUploading(false);
     fetchVectorCollections();
