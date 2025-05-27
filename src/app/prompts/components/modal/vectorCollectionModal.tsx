@@ -18,6 +18,8 @@ const VectorCollectionModal = (props: ModalProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>("");
 
+  const [isUploading, setIsUploading] = useState(false);
+
   const handleRemoveTool = (toolName: string) => {
     setSelectedCollections(selectedCollections.filter((collection) => collection.name !== toolName));
   };
@@ -35,12 +37,19 @@ const VectorCollectionModal = (props: ModalProps) => {
 
   const fileUpload = async () => {
     if (selectedFile) {
-      const response = await uploadVectorStoreFile({ name: fileName, file: selectedFile });
-      setFileName("");
-      setSelectedFile(null);
-      console.log(response);
-      const { name, count } = response;
-      setSelectedCollections([...selectedCollections, { name, count }]);
+      setIsUploading(true);
+      try {
+        const response = await uploadVectorStoreFile({ name: fileName, file: selectedFile });
+        setFileName("");
+        setSelectedFile(null);
+        console.log(response);
+        const { name, count } = response;
+        setSelectedCollections([...selectedCollections, { name, count }]);
+      } catch (error) {
+        console.error("Failed to upload vector collection:", error);
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -84,8 +93,8 @@ const VectorCollectionModal = (props: ModalProps) => {
               <Button variant="primary" className="mt-2 w-fit" onClick={() => setSelectedFile(null)}>
                 취소
               </Button>
-              <Button variant="secondary" className="mt-2 w-fit" onClick={fileUpload} disabled={!selectedFile}>
-                업로드
+              <Button variant="secondary" className="mt-2 w-fit" onClick={fileUpload} disabled={!selectedFile || isUploading}>
+                {isUploading ? "업로드 중..." : "업로드"}
               </Button>
             </div>
           </div>
