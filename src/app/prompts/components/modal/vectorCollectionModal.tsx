@@ -16,7 +16,7 @@ const VectorCollectionModal = (props: ModalProps) => {
   const [selectedCollections, setSelectedCollections] = useState<VectorCollection[]>(props.vectorCollections);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedDescription, setSelectedDescription] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");
 
   const handleRemoveTool = (toolName: string) => {
     setSelectedCollections(selectedCollections.filter((collection) => collection.name !== toolName));
@@ -29,17 +29,18 @@ const VectorCollectionModal = (props: ModalProps) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
+      setFileName(e.target.files[0].name);
     }
   };
 
   const fileUpload = async () => {
     if (selectedFile) {
-      const response = await uploadVectorStoreFile({ name: selectedFile.name, file: selectedFile });
-      setSelectedDescription("");
+      const response = await uploadVectorStoreFile({ name: fileName, file: selectedFile });
+      setFileName("");
       setSelectedFile(null);
       console.log(response);
       const { name, count } = response;
-      setSelectedCollections([...selectedCollections, { name, description: selectedDescription, count }]);
+      setSelectedCollections([...selectedCollections, { name, count }]);
     }
   };
 
@@ -71,11 +72,11 @@ const VectorCollectionModal = (props: ModalProps) => {
       <div className="flex flex-col gap-2 mt-4">
         {selectedFile ? (
           <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md">
-            <label className="block text-lg font-medium text-gray-700 mb-1">파일 추가 설명</label>
+            <label className="block text-lg font-medium text-gray-700 mb-1">컬렉션 이름 변경</label>
             <input
               type="text"
-              value={selectedDescription}
-              onChange={(e) => setSelectedDescription(e.target.value)}
+              value={fileName}
+              onChange={(e) => setFileName(e.target.value)}
               className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none"
             />
             <div className="text-xs text-gray-600 mt-1">선택된 파일: {selectedFile.name}</div>

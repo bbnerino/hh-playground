@@ -39,7 +39,7 @@ export const uploadVectorStoreFile = async ({
   }
 };
 
-const splitText = (text: string, chunkSize = 500) => {
+const splitText = (text: string, chunkSize = 200) => {
   // 간단하게 줄바꿈 기준으로 분할
   const lines = text.split("\n");
   const chunks = [];

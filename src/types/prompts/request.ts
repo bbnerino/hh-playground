@@ -108,6 +108,7 @@ export class PromptRequest {
           )
         );
         try {
+          // 🟢 tool 실행
           const { name, arguments: args } = toolCall.function;
           const tool = toolExecute[name];
           const parsedArgs = JSON.parse(args);
