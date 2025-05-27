@@ -19,9 +19,13 @@ const VectorStoreModal = (props: ModalProps) => {
 
   // 벡터 콜렉션 리스트 불러오기
   const fetchVectorCollections = async () => {
-    const response = await fetch("/api/vectorStore/searchDocuments/all");
-    const data = await response.json();
-    setVectorCollections(data.collections || []);
+    try {
+      const response = await fetch("/api/vectorStore/searchDocuments/all");
+      const data = await response.json();
+      setVectorCollections(data.collections || []);
+    } catch (error) {
+      console.error("Failed to fetch vector collections:", error);
+    }
   };
 
   const getData = async () => {
@@ -49,14 +53,17 @@ const VectorStoreModal = (props: ModalProps) => {
 
   // 벡터스토어 업로드
   const handleUpload = async () => {
-    setIsUploading(true);
     // 리뷰상세내용들을 합쳐서 하나의 텍스트 파일로 만듦
-    const content = reviewList.join("\n\n");
-
-    const response = await uploadVectorStoreFile({ name: `${props.productId}-${productName}`, text: content });
-
-    setIsUploading(false);
-    fetchVectorCollections();
+    try {
+      setIsUploading(true);
+      const content = reviewList.join("\n\n");
+      await uploadVectorStoreFile({ name: `${props.productId}-${productName}`, text: content });
+      fetchVectorCollections();
+    } catch (error) {
+      console.error("Failed to upload vector store:", error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   // 벡터 콜렉션 삭제
@@ -74,7 +81,9 @@ const VectorStoreModal = (props: ModalProps) => {
         <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md">
           <div className="font-bold mb-2">상품번호: {props.productId}</div>
           <div className="font-bold mb-2">상품명: {productName}</div>
-          <div className="font-medium text-sm mb-2">콜렉션: {props.productId}-{productName}</div>
+          <div className="font-medium text-sm mb-2">
+            콜렉션: {props.productId}-{productName}
+          </div>
           <div className="mb-2">리뷰 개수: {reviewList.length}</div>
           <Button variant="secondary" onClick={handleUpload} disabled={isUploading}>
             {isUploading ? "업로드 중..." : "벡터스토어 업로드"}
