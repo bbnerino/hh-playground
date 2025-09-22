@@ -6,6 +6,21 @@ OpenAI Playground를 따라 만들어보며 LLM과 AI 기술을 학습하는 프
 
 이 프로젝트는 OpenAI Playground의 핵심 기능들을 직접 구현해보며 다음과 같은 AI/LLM 개념들을 학습하기 위해 만든 개인 학습용 프로젝트입니다:
 
+## 프로젝트 이미지
+
+메인화면
+<img width="1492" height="844" alt="image" src="https://github.com/user-attachments/assets/7e4d198e-9b64-45f9-b86d-d554b066fb5d" />
+
+벡터 스토어 업로드 / 선택 
+<img width="593" height="472" alt="image" src="https://github.com/user-attachments/assets/4b713542-f2d7-4838-9aeb-248e194fbb92" />
+
+리뷰 데이터 리스트
+<img width="1394" height="824" alt="image" src="https://github.com/user-attachments/assets/d126d94a-8034-431c-aa49-4a658afdf0f0" />
+
+리뷰 데이터 기반 질문 질문 - ReAct 기반 답변 
+<img width="749" height="753" alt="image" src="https://github.com/user-attachments/assets/26f60ef0-b49c-4d10-afdc-16b595044006" />
+
+
 ### 학습 목표
 
 1. **LLM의 흐름** - 대화형 AI의 요청/응답 처리 과정 이해
@@ -34,7 +49,6 @@ OpenAI Playground를 따라 만들어보며 LLM과 AI 기술을 학습하는 프
 ### 2. Tool 시스템
 
 - **날씨 조회** (`getWeather`): 외부 API 연동 예시
-- **에어컨 제어** (`handleAircon`): 가상 IoT 디바이스 제어
 - **리뷰 검색** (`getReviews`): 데이터베이스 쿼리 도구
 - **문서 검색** (`searchDocuments`): RAG 기반 벡터 검색
 
