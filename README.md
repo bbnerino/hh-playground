@@ -230,16 +230,6 @@ AI가 외부 함수를 호출하고 결과를 받아 활용하는 전체 흐름�
 
 ## 프로젝트 이미지
 
-메인화면
-<img width="1492" height="844" alt="image" src="https://github.com/user-attachments/assets/7e4d198e-9b64-45f9-b86d-d554b066fb5d" />
-
-벡터 스토어 업로드 / 선택 
-<img width="593" height="472" alt="image" src="https://github.com/user-attachments/assets/4b713542-f2d7-4838-9aeb-248e194fbb92" />
-
-리뷰 데이터 리스트
-<img width="1233" height="680" alt="image" src="https://github.com/user-attachments/assets/9d602c36-8b9e-4d16-a047-37d6a7182b29" />
-
-리뷰 데이터 기반 질문 질문 - ReAct 기반 답변 
-<img width="1033" height="843" alt="image" src="https://github.com/user-attachments/assets/3bed5237-671b-410d-bae7-c6890dc63b8b" />
+<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/0a17b783-8ae6-4e36-b50c-abf6b161f1d1" />
 
 
