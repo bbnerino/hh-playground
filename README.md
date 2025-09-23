@@ -230,6 +230,6 @@ AI가 외부 함수를 호출하고 결과를 받아 활용하는 전체 흐름�
 
 ## 프로젝트 이미지
 
-<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/0a17b783-8ae6-4e36-b50c-abf6b161f1d1" />
+<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/b4de93c9-25d2-439d-933e-4fe7a4591633" />
 
 
