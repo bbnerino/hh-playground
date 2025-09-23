@@ -1,4 +1,6 @@
+## 프로젝트 이미지
 
+<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/b4de93c9-25d2-439d-933e-4fe7a4591633" />
 
 ## 프로젝트 소개
 
@@ -227,9 +229,5 @@ AI가 외부 함수를 호출하고 결과를 받아 활용하는 전체 흐름�
 이 프로젝트를 통해 AI/LLM의 핵심 개념들을 실제 코드로 구현해보며 개인적으로 깊이 있는 이해를 얻을 수 있습니다.
 
 
-
-## 프로젝트 이미지
-
-<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/b4de93c9-25d2-439d-933e-4fe7a4591633" />
 
 
