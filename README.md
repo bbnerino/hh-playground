@@ -1,4 +1,3 @@
-<img width="1033" height="843" alt="image" src="https://github.com/user-attachments/assets/7c51fc11-c5a0-49fb-b82c-8e0a2c62949f" /># LLM Playground
 
 OpenAI Playground를 따라 만들어보며 LLM과 AI 기술을 학습하는 프로젝트입니다.
 리뷰 데이터 분석 기능이 포함되어 있습니다. 
