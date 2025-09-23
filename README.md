@@ -1,6 +1,7 @@
-# LLM Playground
+<img width="1033" height="843" alt="image" src="https://github.com/user-attachments/assets/7c51fc11-c5a0-49fb-b82c-8e0a2c62949f" /># LLM Playground
 
 OpenAI Playground를 따라 만들어보며 LLM과 AI 기술을 학습하는 프로젝트입니다.
+리뷰 데이터 분석 기능이 포함되어 있습니다. 
 
 ## 프로젝트 소개
 
@@ -15,10 +16,10 @@ OpenAI Playground를 따라 만들어보며 LLM과 AI 기술을 학습하는 프
 <img width="593" height="472" alt="image" src="https://github.com/user-attachments/assets/4b713542-f2d7-4838-9aeb-248e194fbb92" />
 
 리뷰 데이터 리스트
-<img width="1394" height="824" alt="image" src="https://github.com/user-attachments/assets/d126d94a-8034-431c-aa49-4a658afdf0f0" />
+<img width="1233" height="680" alt="image" src="https://github.com/user-attachments/assets/9d602c36-8b9e-4d16-a047-37d6a7182b29" />
 
 리뷰 데이터 기반 질문 질문 - ReAct 기반 답변 
-<img width="749" height="753" alt="image" src="https://github.com/user-attachments/assets/26f60ef0-b49c-4d10-afdc-16b595044006" />
+<img width="1033" height="843" alt="image" src="https://github.com/user-attachments/assets/3bed5237-671b-410d-bae7-c6890dc63b8b" />
 
 
 ### 학습 목표
@@ -55,14 +56,89 @@ OpenAI Playground를 따라 만들어보며 LLM과 AI 기술을 학습하는 프
 ### 3. RAG 시스템
 
 - 리뷰 데이터 임베딩 생성 및 벡터 스토어 저장
+- Qdrant 벡터 데이터베이스에 저장
 - 유사도 기반 문서 검색
 - 컨텍스트 기반 답변 생성
 
-### 4. 데이터 관리 (`/vectorStore`)
+### 4. 리뷰 데이터 관리 
+- 스크립트 실행시 Excel 파일을 SQLite DB로 자동 변환 
+- getReviews 툴 사용시, 상품번호 AI가 특정 상품의 리뷰를 검색할 때 사용 
+- RAG 시스템으로 활용
+- 특정 상품의 리뷰들을 선택하여 벡터화
 
-- Excel 파일을 SQLite DB로 자동 변환
-- 상품별 리뷰 데이터 조회 및 필터링
-- 벡터 스토어 컬렉션 생성 및 관리
+
+```js
+getReviewsFunctionData = {
+  type: "function",
+  function: {
+    name: "getReviews",
+    description: "Get reviews in my location",
+    parameters: {
+      type: "object",
+      properties: {
+        productId: {
+          type: "string",
+          description: "The product id of the reviews"
+        }
+      },
+      required: ["productId"]
+    }
+  }
+};
+
+```
+
+```
+export async function GET(req: NextRequest) {
+  const productId = req.nextUrl.searchParams.get("productId");
+  const page = parseInt(req.nextUrl.searchParams.get("page") || "1", 10);
+  const limit = parseInt(req.nextUrl.searchParams.get("limit") || "10000", 10);
+  const offset = (page - 1) * limit;
+
+  try {
+    const db = new sqlite3.Database("src/app/db/mydb.sqlite");
+    let sql = "SELECT * FROM review_data";
+    const params: string[] = [];
+
+    if (productId) {
+      sql += " WHERE 상품번호 = ?";
+      params.push(productId);
+    }
+
+    // 전체 개수 쿼리
+    const total = await new Promise<number>((resolve, reject) => {
+      let countSql = "SELECT COUNT(*) as count FROM review_data";
+      const countParams: string[] = [];
+      if (productId) {
+        countSql += " WHERE 상품번호 = ?";
+        countParams.push(productId);
+      }
+      db.get(countSql, countParams, (err, row: any) => {
+        if (err) reject(err);
+        else resolve(row.count);
+      });
+    });
+
+    // LIMIT/OFFSET 추가
+    sql += " LIMIT ? OFFSET ?";
+    params.push(limit.toString(), offset.toString());
+
+    // 데이터 쿼리
+    const rows = await new Promise<any[]>((resolve, reject) => {
+      db.all(sql, params, (err, rows) => {
+        db.close();
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+
+    return NextResponse.json({ total, page, limit, rows });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || "REVIEW API error" }, { status: 500 });
+  }
+}
+```
+
 
 ## 시작하기
 
